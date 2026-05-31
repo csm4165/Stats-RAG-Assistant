@@ -1,0 +1,19 @@
+services:
+  stats-rag:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stats-rag-assistant
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env                        # OPENAI_API_KEY 자동 로드
+    volumes:
+      - ./vector_db:/app/vector_db  # 벡터 DB를 마운트로 관리 (선택)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s

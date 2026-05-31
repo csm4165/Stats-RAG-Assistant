@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/
+
+# 환경 변수 (절대 이미지에 포함 금지)
+.env
+.env.*
+!.env.example
+
+# 원본 크롤링 데이터 (vector_db로 대체)
+data/
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# 테스트·문서
+tests/
+*.md
