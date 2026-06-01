@@ -1,13 +1,16 @@
 import streamlit as st
 from pathlib import Path
 import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 # ── 페이지 설정 ──────────────────────────────────────────────
 st.set_page_config(
     page_title="StatQA — 통계 분석 어시스턴트",
     page_icon="📐",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ── CSS ──────────────────────────────────────────────────────
@@ -33,7 +36,7 @@ html, body, [class*="css"] { font-family: 'Pretendard', sans-serif; }
 .block-container { max-width: 900px; padding: 2rem 1.5rem; }
 
 /* hide streamlit chrome */
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
 .stDeployButton { display: none; }
 
 /* ── header ── */
@@ -180,8 +183,7 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
     """RAG 답변 생성. (answer, sources) 반환"""
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from langchain_community.vectorstores import FAISS
-    from langchain.chains import ConversationalRetrievalChain
-    from langchain.memory import ConversationBufferWindowMemory
+    
 
     db_path = "vector_db/faiss_stat_integrated_db"
     if not Path(db_path).exists():
@@ -204,12 +206,12 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
 4. 핵심 가정, 검정 방법, 위반 시 조치를 구체적으로 제시하세요.
 5. 출처는 별도로 표기되므로 답변 본문에 URL을 포함하지 마세요."""
 
-    from langchain.prompts import PromptTemplate
+    from langchain_core.prompts import PromptTemplate
     qa_prompt = PromptTemplate.from_template(
         system_prompt + "\n\n컨텍스트:\n{context}\n\n질문: {question}\n\n답변:"
     )
 
-    docs = retriever.get_relevant_documents(question)
+    docs = retriever.invoke(question)
     context_text = "\n\n---\n\n".join([d.page_content for d in docs])
     sources = list(set([
         d.metadata.get("source", "")
