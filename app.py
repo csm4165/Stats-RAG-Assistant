@@ -200,12 +200,18 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
     system_prompt = """당신은 Penn State STAT 501(회귀분석)과 STAT 504(이산형 데이터 분석) 강의 자료를 기반으로 통계 가이드라인을 제공하는 전문 어시스턴트입니다.
 
 규칙:
-1. 반드시 제공된 컨텍스트(벡터 DB 검색 결과)에 근거하여 답변하세요.
-2. 컨텍스트에 없는 내용은 "제공된 자료에서 해당 내용을 찾을 수 없습니다"라고 명시하세요.
-3. 답변은 한국어로 작성하되, 통계 용어는 영어 병기(예: 다중공선성(Multicollinearity))하세요.
+1. 제공된 컨텍스트(벡터 DB 검색 결과)에 근거해 답변하세요. 컨텍스트에 부분적으로라도 관련된 정보가 있다면 그것을 활용해 충실히 설명하세요.
+2. 컨텍스트가 질문과 완전히 무관한 주제(예: 컨텍스트는 선형회귀인데 질문은 의사결정 트리·딥러닝 등 다른 분야)일 때만 거절하세요. 거절할 때는 정확히 다음 문장만 출력하세요:
+   "제공된 자료에서 해당 내용을 찾을 수 없습니다. STAT 501(회귀분석) 또는 STAT 504(이산자료 분석) 범위 안의 질문을 주세요."
+   거절 시에는 어떤 보충 설명·일반 지식도 절대 추가하지 마세요.
+3. 답변은 한국어로 작성하되, 통계 용어는 영어 병기(예: 다중공선성(Multicollinearity))하세요. 영어 원문은 자연스러운 한국어로 풀어 설명하세요.
 4. 핵심 가정, 검정 방법, 위반 시 조치를 구체적으로 제시하세요.
-5. 출처는 별도로 표기되므로 답변 본문에 URL을 포함하지 마세요."""
-
+5. 출처 URL은 별도 박스에 자동 표시되므로 답변 본문에 URL을 직접 쓰지 마세요.
+6. 이미지는 답변에 절대 포함하지 마세요. `![설명](url)` 형식의 markdown 이미지 문법을 사용하지 마세요.
+   - 이유: 외부 사이트(Penn State)의 이미지가 hotlink 차단되어 어차피 화면에 표시되지 않습니다.
+   - 시각적 그래프 설명이 필요하면 "잔차 플롯에서는 점들이 0을 중심으로 무작위로 흩어진 모습을 확인할 수 있다" 같은 텍스트 묘사로만 표현하세요.
+7. 수식은 LaTeX 문법으로 작성하세요. 인라인은 `$수식$`, 블록 수식은 `$$수식$$`. 단순한 변수도 LaTeX로 감싸 일관되게 표기하세요."""
+  
     from langchain_core.prompts import PromptTemplate
     qa_prompt = PromptTemplate.from_template(
         system_prompt + "\n\n컨텍스트:\n{context}\n\n질문: {question}\n\n답변:"
@@ -213,10 +219,27 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
 
     docs = retriever.invoke(question)
     context_text = "\n\n---\n\n".join([d.page_content for d in docs])
-    sources = list(set([
-        d.metadata.get("source", "")
-        for d in docs if d.metadata.get("source", "")
-    ]))
+
+    # 청크 본문에서 Penn State 강의 URL만 추출 (이미지 파일 URL 제외)
+    import re
+    url_pattern = re.compile(r'https?://online\.stat\.psu\.edu/[^\s\n\)"\']+')
+    image_exts = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.bmp')
+    urls = set()
+    for d in docs:
+        for m in url_pattern.finditer(d.page_content):
+            url = m.group(0).rstrip(').,;:')
+            # 1) base64/data 잡음 제외
+            if "data:" in url or "base64" in url or len(url) > 200:
+                continue
+            # 2) 이미지 파일 URL 제외 (출처는 강의 페이지여야 함)
+            if url.lower().endswith(image_exts):
+                continue
+            # 3) /assets/ 같은 정적 파일 경로 제외
+            if "/assets/" in url or "/files/" in url:
+                continue
+            urls.add(url)
+    sources = sorted(urls)
+    
 
     messages = [
         {"role": "system", "content": system_prompt},
@@ -404,26 +427,92 @@ with tab2:
     st.markdown("")
 
     # 대화 히스토리 출력
+    # Streamlit 네이티브 st.chat_message 사용 → markdown·LaTeX·이미지 자동 렌더링
     if st.session_state.chat_history:
-        html_msgs = '<div class="msg-wrap">'
-        for turn in st.session_state.chat_history:
-            html_msgs += f"""
-            <div class="msg msg-user">
-                <div class="msg-role">You</div>
-                {turn["user"]}
-            </div>
-            <div class="msg msg-ai">
-                <div class="msg-role">StatQA</div>
-                {turn["assistant"].replace(chr(10), "<br>")}
-            </div>
+        import re as _re
+
+        # Penn State 이미지가 hotlink 차단되어 표시 불가 — 모든 markdown 이미지 제거
+        _any_img_pattern = _re.compile(r'!\[[^\]]*\]\([^)]*\)')
+        # URL → 사람이 읽기 좋은 라벨 변환용 패턴들
+        _src_pat_501_sub = _re.compile(r'/stat(\d+)/lesson/(\d+)/\d+\.(\d+)')
+        _src_pat_501_main = _re.compile(r'/stat(\d+)/lesson/(\d+)/?$')
+        _src_pat_504 = _re.compile(r'/stat(\d+)/Lesson(\d+)')
+        _img_url_exts = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp')
+
+        def clean_assistant_text(text: str) -> str:
+            # 이미지 markdown 전부 제거 (Penn State hotlink 차단으로 어차피 표시 불가)
+            return _any_img_pattern.sub("", text)
+
+        def format_source(url: str) -> tuple[str, str]:
+            """URL을 (라벨, 실제 링크 URL) 튜플로 변환.
+            STAT 501: 사이트 개편으로 lesson URL이 404 → 메인 페이지로 폴백
+            STAT 504: lesson URL이 살아있음 → 그대로 사용
+            반환: (사람이 읽기 좋은 라벨, 실제 클릭하면 열릴 URL)
             """
-            if turn.get("sources"):
-                src_links = " &nbsp;·&nbsp; ".join([
-                    f'<a href="{s}" target="_blank">{s}</a>' for s in turn["sources"]
-                ])
-                html_msgs += f'<div class="source-block">📎 출처: {src_links}</div>'
-        html_msgs += '</div>'
-        st.markdown(html_msgs, unsafe_allow_html=True)
+            m = _src_pat_501_sub.search(url)
+            if m:
+                label = f"STAT {m.group(1)} · Lesson {m.group(2)}.{m.group(3)}"
+                return label, f"https://online.stat.psu.edu/stat{m.group(1)}/"
+            m = _src_pat_501_main.search(url)
+            if m:
+                label = f"STAT {m.group(1)} · Lesson {m.group(2)}"
+                return label, f"https://online.stat.psu.edu/stat{m.group(1)}/"
+            m = _src_pat_504.search(url)
+            if m:
+                label = f"STAT {m.group(1)} · Lesson {int(m.group(2))}"
+                return label, url  # STAT 504는 원본 URL 그대로
+            return url, url
+
+        def is_valid_source(url: str) -> bool:
+            if "base64" in url or "data:" in url or len(url) > 200:
+                return False
+            if url.lower().endswith(_img_url_exts):
+                return False
+            if "/assets/" in url or "/files/" in url:
+                return False
+            return True
+
+        # 디버그 토글 (사이드바)
+        with st.sidebar:
+            st.markdown("---")
+            debug_mode = st.checkbox("🔧 디버그 모드 (raw 답변·검색 청크 표시)", value=False)
+
+        for turn in st.session_state.chat_history:
+            with st.chat_message("user", avatar="🧑"):
+                st.markdown(turn["user"])
+
+            with st.chat_message("assistant", avatar="📐"):
+                cleaned = clean_assistant_text(turn["assistant"])
+                st.markdown(cleaned)
+
+                # 디버그 모드: LLM 원본 답변과 정제 후 텍스트 비교
+                if debug_mode:
+                    with st.expander("🔧 디버그 — LLM 원본 답변"):
+                        st.code(turn["assistant"], language="markdown")
+                    with st.expander("🔧 디버그 — 정제(clean) 후 텍스트"):
+                        st.code(cleaned, language="markdown")
+
+                # 출처 표시 (한 번 더 필터링 + 사람이 읽기 좋은 라벨 + 죽은 링크 폴백)
+                if turn.get("sources"):
+                    valid_sources = [s for s in turn["sources"] if is_valid_source(s)]
+                    if valid_sources:
+                        # 중복 라벨 제거 (예: 같은 단원 청크 여러 개 매칭됐을 때)
+                        seen_labels = set()
+                        unique_pairs = []
+                        for s in valid_sources:
+                            label, link = format_source(s)
+                            if label not in seen_labels:
+                                seen_labels.add(label)
+                                unique_pairs.append((label, link))
+
+                        src_links = " &nbsp;·&nbsp; ".join(
+                            f'<a href="{link}" target="_blank">{label}</a>'
+                            for label, link in unique_pairs
+                        )
+                        st.markdown(
+                            f'<div class="source-block">📎 출처: {src_links}</div>',
+                            unsafe_allow_html=True,
+                        )
 
     # 입력 영역
     with st.form("chat_form", clear_on_submit=True):
