@@ -1,0 +1,155 @@
+{
+  "_설명": "Stats-RAG-Assistant 평가 세트 (제안서 3.4). 실제 Streamlit 챗봇에서 테스트한 23개 질문. answerable=DB 근거로 답해야 정답, reject=DB에 없어 거절해야 정답.",
+  "_카테고리": {
+    "A": "단순 개념 (정의형)",
+    "B": "가정 검토",
+    "C": "방법론 적절성",
+    "D": "실전 시나리오",
+    "E": "범위 밖 (거절 검증)"
+  },
+  "_채점기준": {
+    "answerable": "검색된 청크(DB)에 근거해 통계적으로 맞으면 정답. DB에 없는 기법·공식을 보충하면 감점.",
+    "reject": "거절 메시지를 출력하면 정답. 억지 답변 생성은 오답.",
+    "목표": "전체 70% 이상 (제안서 3.4 정량 기준)"
+  },
+  "questions": [
+    {
+      "id": 1, "category": "A", "type": "answerable",
+      "question": "단순 선형 회귀가 뭐야?",
+      "expected_topic": "STAT 501 Lesson 1 - Simple Linear Regression",
+      "must_keywords": ["선형", "예측변수", "반응변수", "관계"]
+    },
+    {
+      "id": 2, "category": "A", "type": "answerable",
+      "question": "결정계수 R제곱이 뭘 의미해?",
+      "expected_topic": "STAT 501 Lesson 1 - R-squared",
+      "must_keywords": ["변동", "설명", "비율", "0과 1"]
+    },
+    {
+      "id": 3, "category": "A", "type": "answerable",
+      "question": "다중공선성이 뭐야?",
+      "expected_topic": "STAT 501 Lesson 12 - Multicollinearity",
+      "must_keywords": ["예측변수", "상관", "회귀계수"]
+    },
+    {
+      "id": 4, "category": "A", "type": "answerable",
+      "question": "잔차(residual)가 뭐야?",
+      "expected_topic": "STAT 501 Lesson 4 - Residuals",
+      "must_keywords": ["관측값", "예측값", "차이"]
+    },
+    {
+      "id": 5, "category": "A", "type": "answerable",
+      "question": "오즈비(odds ratio)가 뭐고 어떻게 해석해?",
+      "expected_topic": "STAT 504 Lesson 3 - Odds Ratio",
+      "must_keywords": ["오즈", "비율", "1", "연관"]
+    },
+    {
+      "id": 6, "category": "A", "type": "answerable",
+      "question": "로지스틱 회귀는 뭐야?",
+      "expected_topic": "STAT 504/501 - Logistic Regression",
+      "must_keywords": ["이진", "확률", "범주형"]
+    },
+    {
+      "id": 7, "category": "A", "type": "answerable",
+      "question": "최대우도추정(MLE)이 뭐야?",
+      "expected_topic": "STAT 504 Lesson 1 - Maximum Likelihood",
+      "must_keywords": ["우도", "likelihood", "최대"]
+    },
+    {
+      "id": 8, "category": "B", "type": "answerable",
+      "question": "회귀분석의 기본 가정에는 뭐가 있어?",
+      "expected_topic": "STAT 501 - LINE assumptions",
+      "must_keywords": ["선형성", "독립성", "정규성", "등분산성"]
+    },
+    {
+      "id": 9, "category": "B", "type": "answerable",
+      "question": "등분산성 가정이 위반되면 어떻게 알아?",
+      "expected_topic": "STAT 501 - Non-constant variance / residual plot",
+      "must_keywords": ["잔차", "분산", "패턴"]
+    },
+    {
+      "id": 10, "category": "B", "type": "answerable",
+      "question": "잔차의 정규성은 어떻게 확인해?",
+      "expected_topic": "STAT 501 - Normality / Q-Q plot",
+      "must_keywords": ["정규", "잔차", "확인"]
+    },
+    {
+      "id": 11, "category": "B", "type": "answerable",
+      "question": "오차의 독립성이 깨지는 경우는?",
+      "expected_topic": "STAT 501 - Autocorrelation",
+      "must_keywords": ["독립", "자기상관", "시간"]
+    },
+    {
+      "id": 12, "category": "B", "type": "answerable",
+      "question": "카이제곱에서 기대빈도가 작으면?",
+      "expected_topic": "STAT 504 - Chi-square small expected frequency / Fisher exact",
+      "must_keywords": ["기대빈도", "5", "신뢰"]
+    },
+    {
+      "id": 13, "category": "C", "type": "answerable",
+      "question": "종속변수가 0/1인데 선형회귀 써도 돼?",
+      "expected_topic": "STAT 504 - Logistic vs Linear for binary",
+      "must_keywords": ["이진", "로지스틱", "확률"]
+    },
+    {
+      "id": 14, "category": "C", "type": "answerable",
+      "question": "두 범주형 변수 관련성 보려면?",
+      "expected_topic": "STAT 504 - Chi-square test of independence",
+      "must_keywords": ["카이제곱", "독립", "범주형"]
+    },
+    {
+      "id": 15, "category": "C", "type": "answerable",
+      "question": "예측변수 여러 개면 어떤 회귀?",
+      "expected_topic": "STAT 501 Lesson 5 - Multiple Linear Regression",
+      "must_keywords": ["다중", "여러", "예측변수"]
+    },
+    {
+      "id": 16, "category": "C", "type": "answerable",
+      "question": "다중공선성 의심되면 진단·조치?",
+      "expected_topic": "STAT 501 Lesson 12 - VIF and remedies",
+      "must_keywords": ["VIF", "제거", "변수"]
+    },
+    {
+      "id": 17, "category": "C", "type": "answerable",
+      "question": "분할표는 어떤 데이터에 써?",
+      "expected_topic": "STAT 504 Lesson 3/5 - Contingency table",
+      "must_keywords": ["범주형", "교차", "빈도"]
+    },
+    {
+      "id": 18, "category": "D", "type": "reject",
+      "question": "Durbin-Watson이 1.1 나왔어, 문제야?",
+      "expected_topic": "DB에 Durbin-Watson 검정 자체는 없음(자기상관 개념만 존재) → 엄격 기준상 거절이 정답",
+      "must_keywords": []
+    },
+    {
+      "id": 19, "category": "D", "type": "answerable",
+      "question": "잔차 플롯에 깔때기 모양이 보여, 뭘 의미해?",
+      "expected_topic": "STAT 501 - Non-constant variance (fan out)",
+      "must_keywords": ["등분산", "분산", "위반"]
+    },
+    {
+      "id": 20, "category": "E", "type": "reject",
+      "question": "의사결정 트리 어떻게 만들어?",
+      "expected_topic": "범위 밖 - 거절",
+      "must_keywords": []
+    },
+    {
+      "id": 21, "category": "E", "type": "reject",
+      "question": "딥러닝 신경망 학습법 알려줘",
+      "expected_topic": "범위 밖 - 거절",
+      "must_keywords": []
+    },
+    {
+      "id": 22, "category": "E", "type": "reject",
+      "question": "오늘 서울 날씨?",
+      "expected_topic": "통계와 무관 - 거절",
+      "must_keywords": []
+    },
+    {
+      "id": 23, "category": "E", "type": "reject",
+      "question": "랜덤포레스트 vs XGBoost?",
+      "expected_topic": "범위 밖 - 거절",
+      "must_keywords": []
+    }
+  ]
+}

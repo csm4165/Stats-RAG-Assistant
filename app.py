@@ -16,149 +16,182 @@ st.set_page_config(
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=Pretendard:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-    --bg:       #0f0f11;
-    --surface:  #18181c;
-    --border:   #2a2a32;
-    --accent:   #7c6aff;
-    --accent2:  #00e5b0;
-    --text:     #e8e8f0;
-    --muted:    #6b6b80;
-    --user-bg:  #1e1e28;
-    --ai-bg:    #141420;
+    --bg:        #eef0fb;
+    --bg2:       #e4e7f9;
+    --surface:   #ffffff;
+    --border:    #e6e8f2;
+    --accent:    #6c5ce7;
+    --accent-dk: #5546c8;
+    --accent2:   #00b894;
+    --text:      #1f2233;
+    --text2:     #4a4e69;
+    --muted:     #8a8fa8;
+    --user-bg:   #f3f1fe;
+    --ai-bg:     #ffffff;
 }
 
 /* reset */
-html, body, [class*="css"] { font-family: 'Pretendard', sans-serif; }
-.stApp { background: var(--bg); color: var(--text); }
-.block-container { max-width: 900px; padding: 2rem 1.5rem; }
+html, body, [class*="css"] { font-family: 'Inter', 'Pretendard', sans-serif; }
+.stApp {
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
+    color: var(--text);
+}
+/* 메인 영역을 흰 카드처럼 */
+.block-container {
+    max-width: 980px;
+    padding: 1.5rem 2.2rem 3rem;
+    background: var(--surface);
+    border-radius: 18px;
+    margin-top: 1.5rem;
+    box-shadow: 0 10px 40px rgba(80, 70, 160, 0.08);
+}
 
 /* hide streamlit chrome */
 #MainMenu, footer { visibility: hidden; }
 .stDeployButton { display: none; }
 
+/* 본문 글씨 가독성 — 진한 색 */
+.stApp, .stMarkdown, .stMarkdown p, .stMarkdown li {
+    color: var(--text) !important;
+}
+.stMarkdown p, .stMarkdown li { font-size: 0.95rem; line-height: 1.75; }
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: var(--text) !important; }
+
 /* ── header ── */
 .site-header {
-    display: flex; align-items: baseline; gap: 1rem;
+    display: flex; align-items: center; gap: 0.8rem;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 1.2rem; margin-bottom: 2rem;
+    padding-bottom: 1.1rem; margin-bottom: 1.6rem;
 }
 .site-title {
-    font-family: 'Instrument Serif', serif;
-    font-size: 2.1rem; color: var(--text); letter-spacing: -0.02em;
+    font-weight: 700; font-size: 1.7rem; color: var(--text);
+    letter-spacing: -0.02em;
 }
 .site-badge {
     font-family: 'DM Mono', monospace;
-    font-size: 0.7rem; color: var(--accent2);
-    border: 1px solid var(--accent2);
-    padding: 2px 8px; border-radius: 4px; letter-spacing: 0.08em;
+    font-size: 0.68rem; color: #fff; background: var(--accent);
+    padding: 3px 9px; border-radius: 6px; letter-spacing: 0.06em;
 }
 .site-sub {
-    font-size: 0.85rem; color: var(--muted); margin-left: auto;
+    font-size: 0.82rem; color: var(--muted); margin-left: auto;
 }
+
+/* ── sidebar ── */
+[data-testid="stSidebar"] {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+}
+[data-testid="stSidebar"] * { color: var(--text2); }
+.sb-brand {
+    font-weight: 700; font-size: 1.3rem; color: var(--text);
+    margin-bottom: 0.2rem;
+}
+.sb-brand-sub {
+    font-size: 0.72rem; color: var(--muted); margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+}
+.sb-section {
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin: 1.1rem 0 0.5rem;
+}
+.sb-card {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.8rem 0.95rem;
+    font-size: 0.8rem; line-height: 1.6; color: var(--text2);
+    margin-bottom: 0.5rem;
+}
+.sb-card b { color: var(--text); }
+.sb-src {
+    display: block; font-size: 0.78rem; color: var(--text2);
+    text-decoration: none; padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+}
+.sb-src:hover { color: var(--accent); }
+.sb-src span { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 0.7rem; }
 
 /* ── tabs ── */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 0; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 8px;
-    padding: 4px; margin-bottom: 1.5rem;
+    gap: 4px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 5px; margin-bottom: 1.5rem;
 }
 .stTabs [data-baseweb="tab"] {
-    font-family: 'DM Mono', monospace !important;
-    font-size: 0.78rem !important; letter-spacing: 0.04em;
-    color: var(--muted) !important;
-    background: transparent !important;
-    border-radius: 5px; padding: 8px 20px;
-    border: none !important;
+    font-size: 0.85rem !important; font-weight: 500;
+    color: var(--muted) !important; background: transparent !important;
+    border-radius: 7px; padding: 9px 22px; border: none !important;
     transition: all 0.15s ease;
 }
 .stTabs [aria-selected="true"] {
-    color: var(--text) !important;
-    background: var(--border) !important;
+    color: #fff !important; background: var(--accent) !important;
 }
 .stTabs [data-baseweb="tab-panel"] { padding-top: 0; }
-.stTabs [data-baseweb="tab-highlight"] { display: none; }
-.stTabs [data-baseweb="tab-border"] { display: none; }
+.stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"] { display: none; }
 
 /* ── form elements ── */
 .stSelectbox > div > div,
-.stRadio > div,
-.stTextArea > div > div {
+.stTextArea > div > div,
+.stTextInput > div > div {
     background: var(--surface) !important;
     border-color: var(--border) !important;
-    border-radius: 6px !important;
-    color: var(--text) !important;
+    border-radius: 9px !important; color: var(--text) !important;
 }
 .stSelectbox label, .stRadio label, .stTextArea label,
-.stNumberInput label, .stSlider label {
-    font-size: 0.82rem !important; color: var(--muted) !important;
-    font-weight: 500 !important; letter-spacing: 0.03em;
-    text-transform: uppercase;
+.stNumberInput label, .stTextInput label {
+    font-size: 0.8rem !important; color: var(--text2) !important;
+    font-weight: 600 !important;
 }
 .stButton > button {
-    background: var(--accent) !important;
-    color: #fff !important; border: none !important;
-    border-radius: 6px !important; font-family: 'DM Mono', monospace !important;
-    font-size: 0.78rem !important; letter-spacing: 0.05em;
-    padding: 0.55rem 1.4rem !important;
-    transition: opacity 0.15s ease;
+    background: var(--accent) !important; color: #fff !important;
+    border: none !important; border-radius: 9px !important;
+    font-weight: 600 !important; font-size: 0.85rem !important;
+    padding: 0.55rem 1.5rem !important; transition: all 0.15s ease;
+    box-shadow: 0 4px 14px rgba(108, 92, 231, 0.25);
 }
-.stButton > button:hover { opacity: 0.85; }
+.stButton > button:hover { background: var(--accent-dk) !important; }
 
-/* ── chat messages ── */
-.msg-wrap { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
-.msg { padding: 1rem 1.2rem; border-radius: 8px; line-height: 1.65; font-size: 0.92rem; }
-.msg-user { background: var(--user-bg); border-left: 2px solid var(--accent); }
-.msg-ai   { background: var(--ai-bg);   border-left: 2px solid var(--accent2); }
-.msg-role {
-    font-family: 'DM Mono', monospace; font-size: 0.68rem;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    margin-bottom: 0.4rem;
+/* ── chat messages (st.chat_message 네이티브) ── */
+[data-testid="stChatMessage"] {
+    background: var(--ai-bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 0.4rem 0.3rem;
+    box-shadow: 0 2px 10px rgba(80, 70, 160, 0.04);
 }
-.msg-user .msg-role { color: var(--accent); }
-.msg-ai   .msg-role { color: var(--accent2); }
 
 /* ── source badge ── */
 .source-block {
-    margin-top: 0.8rem; padding: 0.6rem 0.9rem;
-    background: #0f0f18; border: 1px solid var(--border);
-    border-radius: 6px; font-size: 0.78rem;
-    font-family: 'DM Mono', monospace; color: var(--muted);
+    margin-top: 0.7rem; padding: 0.55rem 0.9rem;
+    background: var(--user-bg); border: 1px solid var(--border);
+    border-radius: 9px; font-size: 0.78rem; color: var(--text2);
 }
-.source-block a { color: var(--accent2) !important; text-decoration: none; }
+.source-block a { color: var(--accent) !important; text-decoration: none; font-weight: 500; }
 .source-block a:hover { text-decoration: underline; }
 
 /* ── recommender cards ── */
 .rec-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 1.2rem 1.4rem; margin-bottom: 0.8rem;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem 1.4rem; margin-bottom: 0.8rem;
 }
-.rec-card-title {
-    font-family: 'Instrument Serif', serif;
-    font-size: 1.1rem; color: var(--text); margin-bottom: 0.4rem;
-}
-.rec-card-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.6rem; }
+.rec-card-title { font-weight: 700; font-size: 1.15rem; color: var(--text); margin-bottom: 0.4rem; }
+.rec-card-sub { font-size: 0.85rem; color: var(--text2); margin-bottom: 0.7rem; }
 .tag {
-    display: inline-block;
-    font-family: 'DM Mono', monospace; font-size: 0.68rem;
-    letter-spacing: 0.06em; padding: 2px 8px;
-    border-radius: 4px; margin-right: 6px; margin-top: 4px;
+    display: inline-block; font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; letter-spacing: 0.04em; padding: 3px 9px;
+    border-radius: 6px; margin-right: 6px; margin-top: 4px;
 }
-.tag-method  { background: #1a1a3a; color: var(--accent); border: 1px solid var(--accent); }
-.tag-warn    { background: #1a1200; color: #f5c542; border: 1px solid #f5c542; }
-.tag-ok      { background: #001a12; color: var(--accent2); border: 1px solid var(--accent2); }
+.tag-method { background: #ede9ff; color: var(--accent); border: 1px solid #d6ccff; }
+.tag-warn   { background: #fff4d6; color: #b8860b; border: 1px solid #f0d98a; }
+.tag-ok     { background: #d6f5ec; color: var(--accent2); border: 1px solid #a3e6d2; }
 
 /* ── section label ── */
 .section-label {
-    font-family: 'DM Mono', monospace; font-size: 0.7rem;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 0.6rem;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem;
 }
 
 /* ── divider ── */
-hr { border-color: var(--border) !important; margin: 1.5rem 0; }
+hr { border-color: var(--border) !important; margin: 1.3rem 0; }
 
 /* spinner */
 .stSpinner > div { border-top-color: var(--accent) !important; }
@@ -200,12 +233,16 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
     system_prompt = """당신은 Penn State STAT 501(회귀분석)과 STAT 504(이산형 데이터 분석) 강의 자료를 기반으로 통계 가이드라인을 제공하는 전문 어시스턴트입니다.
 
 규칙:
-1. 제공된 컨텍스트(벡터 DB 검색 결과)에 근거해 답변하세요. 컨텍스트에 부분적으로라도 관련된 정보가 있다면 그것을 활용해 충실히 설명하세요.
-2. 컨텍스트가 질문과 완전히 무관한 주제(예: 컨텍스트는 선형회귀인데 질문은 의사결정 트리·딥러닝 등 다른 분야)일 때만 거절하세요. 거절할 때는 정확히 다음 문장만 출력하세요:
+1. [가장 중요] 오직 아래 제공된 컨텍스트(벡터 DB 검색 결과)에 실제로 적혀 있는 내용만으로 답변하세요. 컨텍스트에 없는 공식·수치·정의·예시·기법 이름은 당신이 알고 있더라도 절대 지어내거나 보충하지 마세요. 사전 학습 지식·일반 상식은 사용 금지입니다.
+   - 특히 다음을 금지합니다: 컨텍스트에 등장하지 않는 검정/기법/모델 이름을 언급하는 것 (예: 컨텍스트에 없는데 "Breusch-Pagan 검정", "Levene 검정", "ARIMA", "Lasso 회귀", "주성분 회귀", "조건수" 등을 답변에 추가하면 안 됨).
+   - 컨텍스트에 부분적으로만 있으면 그 부분까지만 설명하고, 나머지는 "제공된 자료에는 이 부분에 대한 추가 설명이 없습니다"라고 솔직히 밝히세요.
+2. 답변하기 전에 먼저 판단하세요: "이 질문이 컨텍스트의 통계 주제(회귀분석·이산자료 분석)와 실제로 관련이 있는가?"
+   - 질문이 통계 분석과 무관하거나(예: 날씨·일상 잡담·코딩·일반 시사), 컨텍스트가 질문과 명백히 다른 분야(예: 의사결정 트리·딥러닝·랜덤포레스트·XGBoost)이면, 컨텍스트에 우연히 비슷한 단어가 있더라도 억지로 답하지 말고 정확히 다음 문장만 출력하세요:
    "제공된 자료에서 해당 내용을 찾을 수 없습니다. STAT 501(회귀분석) 또는 STAT 504(이산자료 분석) 범위 안의 질문을 주세요."
-   거절 시에는 어떤 보충 설명·일반 지식도 절대 추가하지 마세요.
+   - 거절 시에는 어떤 보충 설명·추측·일반 지식도 절대 추가하지 마세요.
+   - 회귀분석·로지스틱회귀·분산분석·카이제곱·오즈비·잔차·상관·다중공선성·MLE 등 명백한 통계 주제는 거절하지 말고 컨텍스트 근거로 답하세요.
 3. 답변은 한국어로 작성하되, 통계 용어는 영어 병기(예: 다중공선성(Multicollinearity))하세요. 영어 원문은 자연스러운 한국어로 풀어 설명하세요.
-4. 핵심 가정, 검정 방법, 위반 시 조치를 구체적으로 제시하세요.
+4. 핵심 가정, 검정 방법, 위반 시 조치를 제시하되, 반드시 컨텍스트에 있는 내용에 한해서만 제시하세요. 컨텍스트에 없으면 만들어내지 마세요.
 5. 출처 URL은 별도 박스에 자동 표시되므로 답변 본문에 URL을 직접 쓰지 마세요.
 6. 이미지는 답변에 절대 포함하지 마세요. `![설명](url)` 형식의 markdown 이미지 문법을 사용하지 마세요.
    - 이유: 외부 사이트(Penn State)의 이미지가 hotlink 차단되어 어차피 화면에 표시되지 않습니다.
@@ -217,26 +254,33 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
         system_prompt + "\n\n컨텍스트:\n{context}\n\n질문: {question}\n\n답변:"
     )
 
-    docs = retriever.invoke(question)
+    # ── 검색용 영어 쿼리 생성 ──
+    # 자료는 영어(Penn State)인데 질문은 한국어라 임베딩 매칭이 약함.
+    # 검색 전에 한국어 질문을 영어 통계 키워드로 번역·확장해서 검색 정확도를 높인다.
+    import openai
+    _client = openai.OpenAI(api_key=api_key)
+    try:
+        _tr = _client.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0,
+            messages=[
+                {"role": "system", "content": "You translate Korean statistics questions into concise English search queries using standard statistical terminology (e.g., '오즈비' → 'odds ratio'). Output ONLY the English query, no explanation."},
+                {"role": "user", "content": question},
+            ],
+        )
+        search_query = _tr.choices[0].message.content.strip()
+    except Exception:
+        search_query = question  # 번역 실패 시 원문으로 폴백
+
+    # 한국어 원문 + 영어 번역 둘 다로 검색 (양쪽 매칭 보강)
+    docs = retriever.invoke(f"{search_query} {question}")
     context_text = "\n\n---\n\n".join([d.page_content for d in docs])
 
-    # 청크 본문에서 Penn State 강의 URL만 추출 (이미지 파일 URL 제외)
-    import re
-    url_pattern = re.compile(r'https?://online\.stat\.psu\.edu/[^\s\n\)"\']+')
-    image_exts = ('.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.bmp')
+    # 출처: 각 청크의 metadata['source']에서 추출 (DB 빌드 시 단원별로 부착됨)
     urls = set()
     for d in docs:
-        for m in url_pattern.finditer(d.page_content):
-            url = m.group(0).rstrip(').,;:')
-            # 1) base64/data 잡음 제외
-            if "data:" in url or "base64" in url or len(url) > 200:
-                continue
-            # 2) 이미지 파일 URL 제외 (출처는 강의 페이지여야 함)
-            if url.lower().endswith(image_exts):
-                continue
-            # 3) /assets/ 같은 정적 파일 경로 제외
-            if "/assets/" in url or "/files/" in url:
-                continue
+        url = d.metadata.get("source", "")
+        if url:
             urls.add(url)
     sources = sorted(urls)
     
@@ -254,7 +298,10 @@ def get_rag_answer(question: str, history: list, api_key: str) -> tuple[str, lis
     resp = client.chat.completions.create(model="gpt-4o-mini", messages=messages, temperature=0.2)
     answer = resp.choices[0].message.content
 
-    return answer, sources
+    # 디버그용: 검색된 원문 청크 본문도 함께 반환
+    retrieved_chunks = [d.page_content for d in docs]
+
+    return answer, sources, retrieved_chunks
 
 
 # ── 통계 기법 추천 로직 ──────────────────────────────────────
@@ -328,23 +375,53 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# API Key 입력 (사이드바)
+# ── 사이드바 (제안서 2.1: 프로젝트 개요 + 사용 가이드 + 출처 + 설정) ──
 with st.sidebar:
-    st.markdown("### ⚙️ 설정")
+    st.markdown('<div class="sb-brand">📐 StatQA</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sb-brand-sub">통계 가이드라인 RAG 어시스턴트</div>', unsafe_allow_html=True)
+
+    # 프로젝트 개요
+    st.markdown('<div class="sb-section">프로젝트 개요</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sb-card">검증된 통계 전공 자료(<b>Penn State</b>)만을 근거로 답하는 RAG 챗봇입니다. '
+        'AI가 자료에 없는 내용을 지어내는 <b>환각(Hallucination)</b>을 차단하도록 설계되었습니다.</div>',
+        unsafe_allow_html=True,
+    )
+
+    # 사용 가이드
+    st.markdown('<div class="sb-section">사용 가이드</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sb-card">① <b>기법 추천</b> 탭: 데이터 유형을 고르면 적합한 분석법을 추천<br>'
+        '② <b>통계 검증 챗봇</b> 탭: 통계 개념·가정·방법론을 자연어로 질문<br>'
+        '③ 답변 하단에서 참고한 <b>출처 단원</b>을 확인</div>',
+        unsafe_allow_html=True,
+    )
+
+    # 참고 자료 출처
+    st.markdown('<div class="sb-section">참고 자료 (Data Source)</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<a class="sb-src" href="https://online.stat.psu.edu/stat501/" target="_blank">'
+        'Penn State STAT 501 <span>회귀분석</span></a>'
+        '<a class="sb-src" href="https://online.stat.psu.edu/stat504/" target="_blank">'
+        'Penn State STAT 504 <span>이산자료 분석</span></a>',
+        unsafe_allow_html=True,
+    )
+
+    # 설정
+    st.markdown('<div class="sb-section">설정</div>', unsafe_allow_html=True)
     api_input = st.text_input(
         "OpenAI API Key",
         value=st.session_state.api_key,
         type="password",
         placeholder="sk-proj-...",
-        help=".env 파일에 OPENAI_API_KEY가 있으면 자동으로 로드됩니다."
+        help=".env 파일에 OPENAI_API_KEY가 있으면 자동으로 로드됩니다.",
     )
     if api_input:
         st.session_state.api_key = api_input
     st.caption("키는 세션 내에서만 사용되며 저장되지 않습니다.")
-    st.markdown("---")
-    st.markdown("**벡터 DB 경로**")
-    st.code("vector_db/faiss_stat_integrated_db", language=None)
-    st.caption("폴더가 없으면 faiss_stat501_db로 폴백합니다.")
+
+    debug_mode = st.checkbox("🔧 디버그 모드 (검색 청크·raw 답변 표시)", value=False)
+    st.session_state["debug_mode"] = debug_mode
 
 
 # ── 탭 ───────────────────────────────────────────────────────
@@ -441,7 +518,10 @@ with tab2:
 
         def clean_assistant_text(text: str) -> str:
             # 이미지 markdown 전부 제거 (Penn State hotlink 차단으로 어차피 표시 불가)
-            return _any_img_pattern.sub("", text)
+            text = _any_img_pattern.sub("", text)
+            # KaTeX가 모르는 LaTeX 명령 보정 (\mbox → \text 등)
+            text = text.replace(r"\mbox", r"\text")
+            return text
 
         def format_source(url: str) -> tuple[str, str]:
             """URL을 (라벨, 실제 링크 URL) 튜플로 변환.
@@ -472,10 +552,7 @@ with tab2:
                 return False
             return True
 
-        # 디버그 토글 (사이드바)
-        with st.sidebar:
-            st.markdown("---")
-            debug_mode = st.checkbox("🔧 디버그 모드 (raw 답변·검색 청크 표시)", value=False)
+        debug_mode = st.session_state.get("debug_mode", False)
 
         for turn in st.session_state.chat_history:
             with st.chat_message("user", avatar="🧑"):
@@ -485,12 +562,15 @@ with tab2:
                 cleaned = clean_assistant_text(turn["assistant"])
                 st.markdown(cleaned)
 
-                # 디버그 모드: LLM 원본 답변과 정제 후 텍스트 비교
+                # 디버그 모드: 검색된 원문 청크 + LLM 답변
                 if debug_mode:
-                    with st.expander("🔧 디버그 — LLM 원본 답변"):
+                    chunks = turn.get("chunks", [])
+                    with st.expander(f"🔧 디버그 ① 검색된 원문 청크 ({len(chunks)}개) — DB에서 가져온 근거"):
+                        for ci, chunk in enumerate(chunks, 1):
+                            st.markdown(f"**[청크 {ci}]**")
+                            st.code(chunk, language="markdown")
+                    with st.expander("🔧 디버그 ② LLM 원본 답변 (가공 전)"):
                         st.code(turn["assistant"], language="markdown")
-                    with st.expander("🔧 디버그 — 정제(clean) 후 텍스트"):
-                        st.code(cleaned, language="markdown")
 
                 # 출처 표시 (한 번 더 필터링 + 사람이 읽기 좋은 라벨 + 죽은 링크 폴백)
                 if turn.get("sources"):
@@ -538,7 +618,7 @@ with tab2:
         else:
             with st.spinner("Penn State 자료를 검색하는 중..."):
                 try:
-                    answer, sources = get_rag_answer(
+                    answer, sources, retrieved_chunks = get_rag_answer(
                         user_input.strip(),
                         st.session_state.chat_history,
                         st.session_state.api_key,
@@ -547,6 +627,7 @@ with tab2:
                         "user": user_input.strip(),
                         "assistant": answer,
                         "sources": sources,
+                        "chunks": retrieved_chunks,
                     })
                     st.rerun()
                 except Exception as e:
