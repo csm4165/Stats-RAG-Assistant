@@ -155,9 +155,36 @@ html, body, [class*="css"] { font-family: 'Inter', 'Pretendard', sans-serif; }
 /* ── chat messages (st.chat_message 네이티브) ── */
 [data-testid="stChatMessage"] {
     background: var(--ai-bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 0.4rem 0.3rem;
+    border-radius: 12px; padding: 0.8rem 1.1rem;
     box-shadow: 0 2px 10px rgba(80, 70, 160, 0.04);
+    width: 100%;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 0.6rem !important;
 }
+/* 아바타는 고정 크기, 본문이 나머지 폭을 전부 차지 */
+[data-testid="stChatMessage"] > [data-testid="stChatMessageAvatar"],
+[data-testid="stChatMessage"] > img:first-child { flex: 0 0 auto !important; }
+[data-testid="stChatMessage"] > div:last-child {
+    flex: 1 1 auto !important; width: auto !important; min-width: 0 !important;
+}
+[data-testid="stChatMessageContent"],
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+    width: 100% !important; max-width: 100% !important;
+}
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] li { word-break: keep-all; overflow-wrap: anywhere; }
+
+/* 디버그 청크(st.code) — 가로 스크롤 대신 자동 줄바꿈으로 한눈에 보이게 */
+[data-testid="stExpander"] pre,
+[data-testid="stExpander"] code,
+pre, code {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+    overflow-x: hidden !important;
+}
+[data-testid="stExpander"] pre { max-width: 100% !important; }
 
 /* ── source badge ── */
 .source-block {
@@ -195,6 +222,31 @@ hr { border-color: var(--border) !important; margin: 1.3rem 0; }
 
 /* spinner */
 .stSpinner > div { border-top-color: var(--accent) !important; }
+
+/* ── 인쇄(PDF 저장) 전용 — 사이드바 숨기고 본문을 종이 전체로 ── */
+@media print {
+    /* 사이드바·헤더·툴바 등 인쇄 불필요 요소 숨김 */
+    [data-testid="stSidebar"],
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stToolbar"],
+    header { display: none !important; }
+
+    /* 본문이 종이 폭 전체를 쓰도록 */
+    [data-testid="stAppViewContainer"] > .main,
+    .main .block-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0.5cm !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+    }
+    .stApp { background: #ffffff !important; }
+
+    /* 채팅 메시지가 페이지 중간에서 잘리지 않게 */
+    [data-testid="stChatMessage"] { break-inside: avoid; page-break-inside: avoid; }
+    [data-testid="stExpander"] { break-inside: avoid; page-break-inside: avoid; }
+}
 </style>
 """, unsafe_allow_html=True)
 
