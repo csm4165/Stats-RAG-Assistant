@@ -573,6 +573,9 @@ with tab2:
             text = _any_img_pattern.sub("", text)
             # KaTeX가 모르는 LaTeX 명령 보정 (\mbox → \text 등)
             text = text.replace(r"\mbox", r"\text")
+            # LaTeX 구분자 보정: 모델이 가끔 \[ \] \( \)로 출력 → KaTeX는 $ 기반만 렌더하므로 변환
+            text = text.replace(r"\[", "$$").replace(r"\]", "$$")
+            text = text.replace(r"\(", "$").replace(r"\)", "$")
             return text
 
         def format_source(url: str) -> tuple[str, str]:
